@@ -1,7 +1,68 @@
 import logoDark from "./logo-dark.svg";
 import logoLight from "./logo-light.svg";
+import {DigitalTransformationGuide} from "~/components/DigitalTransformationGuide"
+import {useEffect} from "react";
+import {supabase} from "~/auth/utils/supabase";
+
+import {I18nProvider,useI18n} from "~/context/I18nContext";
 
 export function Welcome() {
+    const { t } = useI18n();
+    //let lang = i18n.resolvedLanguage;
+
+    const handlePostSocialLogin = async (user: any) => {
+        if(user){
+            try {
+                //console.log('🔄 Processando login social para:', user.email);
+
+                // 1. Chamar o mesmo serviço que você usa no registo normal
+
+                const url = import.meta.env.PROD ? "https://services.execlog.com" : "http://localhost:3003";
+                const checkResponse = await fetch(`${url}/register-profile`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        data: {
+                            user: {
+                                id: user.id,
+                                email: user.email,
+                                // Inclua outros dados que possam estar disponíveis
+                                user_metadata: user.user_metadata
+                            },
+                            envData:{
+                                app_name: import.meta.env.VITE_APP_NAME,
+                                brand_name: import.meta.env.VITE_BRAND_NAME
+                            }
+                        }
+                    })
+                });
+                const resp = await checkResponse.json();
+                console.log('✅ Profile criado/verificado:', resp);
+
+
+            } catch (err) {
+                console.error('❌ Erro pós-login social:', err);
+                // Não mostrar erro ao usuário para não estragar a experiência
+            }
+        }
+
+    };
+
+
+    useEffect(() => {
+        const { data: subscription } = supabase.auth.onAuthStateChange(
+            (event, session) => {
+                console.log('Auth event:', event)
+                handlePostSocialLogin(session?.user)
+            }
+        )
+
+        // limpar o listener quando o componente desmonta
+        return () => {
+            subscription.subscription.unsubscribe()
+        }
+    }, [])
+
   return (
     <main className="flex items-center justify-center pt-16 pb-4">
       <div className="flex-1 flex flex-col items-center gap-16 min-h-0">
@@ -19,10 +80,11 @@ export function Welcome() {
             />
           </div>
         </header>
+          {/*<DigitalTransformationGuide/>*/}
         <div className="max-w-[300px] w-full space-y-6 px-4">
           <nav className="rounded-3xl border border-gray-200 p-6 dark:border-gray-700 space-y-4">
             <p className="leading-6 text-gray-700 dark:text-gray-200 text-center">
-              What&apos;s next?
+                {t("common.welcome")}
             </p>
             <ul>
               {resources.map(({ href, text, icon }) => (

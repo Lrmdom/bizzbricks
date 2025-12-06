@@ -1,0 +1,52 @@
+{
+  "common": {
+    "welcome": "Welcome",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "search": "Search",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next"
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "signup": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "forgot_password": "Forgot your password?",
+    "remember_me": "Remember me",
+    "no_account": "Don't have an account?",
+    "has_account": "Already have an account?"
+  },
+  "navigation": {
+    "home": "Home",
+    "profile": "Profile",
+    "settings": "Settings",
+    "dashboard": "Dashboard",
+    "about": "About",
+    "contact": "Contact"
+  },
+  "user": {
+    "welcome": "Hello, {{name}}!",
+    "profile": "Your Profile",
+    "settings": "Settings",
+    "account": "Account",
+    "preferences": "Preferences"
+  },
+  "calendar": {
+    "schedule_meeting": "Schedule a meeting",
+    "book_appointment": "Book an appointment",
+    "meeting_scheduled": "Meeting scheduled successfully"
+  },
+  "errors": {
+    "required": "This field is required",
+    "invalid_email": "Invalid email address",
+    "network_error": "Network error occurred"
+  }
+}

@@ -1,5 +1,7 @@
 import type { Route } from "./+types/home";
 import { Welcome } from "../welcome/welcome";
+import {useEffect} from "react";
+import {supabase} from "~/auth/utils/supabase";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -9,5 +11,6 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Home() {
+
   return <Welcome />;
 }

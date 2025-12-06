@@ -1,0 +1,52 @@
+{
+  "common": {
+    "welcome": "Bem-vindo",
+    "loading": "A carregar...",
+    "error": "Erro",
+    "success": "Sucesso",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "search": "Pesquisar",
+    "confirm": "Confirmar",
+    "back": "Voltar",
+    "next": "Seguinte"
+  },
+  "auth": {
+    "login": "Iniciar sessão",
+    "logout": "Terminar sessão",
+    "signup": "Registar",
+    "email": "Email",
+    "password": "Palavra-passe",
+    "forgot_password": "Esqueceu a palavra-passe?",
+    "remember_me": "Lembrar-me",
+    "no_account": "Não tem uma conta?",
+    "has_account": "Já tem uma conta?"
+  },
+  "navigation": {
+    "home": "Início",
+    "profile": "Perfil",
+    "settings": "Definições",
+    "dashboard": "Painel",
+    "about": "Sobre",
+    "contact": "Contacto"
+  },
+  "user": {
+    "welcome": "Olá, {{name}}!",
+    "profile": "O seu perfil",
+    "settings": "Definições",
+    "account": "Conta",
+    "preferences": "Preferências"
+  },
+  "calendar": {
+    "schedule_meeting": "Agendar uma reunião",
+    "book_appointment": "Marcar uma consulta",
+    "meeting_scheduled": "Reunião agendada com sucesso"
+  },
+  "errors": {
+    "required": "Este campo é obrigatório",
+    "invalid_email": "Endereço de email inválido",
+    "network_error": "Ocorreu um erro de rede"
+  }
+}
