@@ -56,11 +56,11 @@ export const loader = async ({request, params}: LoaderFunctionArgs) => {
     // 2. LÓGICA DE INICIALIZAÇÃO GCS DUPLICADA REMOVIDA AQUI!
 
     const ENV = { /* Adicione suas variáveis de ambiente aqui, se necessário */ };
-    //const locale = getServerLanguage(request);
+    let locale = getServerLanguage(request);
 
     // @ts-ignore
     !params.locale ? (params.locale = locale) : params.locale;
-    const locale = params.locale;
+     locale = params.locale || 'pt';
     const GCS_BUCKET_NAME = "bizzbricks-sanity-json-data";
     // Exemplo: bizzbricks-sanity-data-pt.json
     const GCS_DATA_FILE_NAME = `bizzbricks-sanity-data-${locale}.json`
@@ -97,7 +97,7 @@ console.log(bucketData2)
     const [countryCode, setCountryCode] = useState<string | null>(null);
     const [address, setAddress] = useState<string | null>(null);
     // Use 'locale' que vem do loader, pois 'loaderData?.serverLanguage' não está sendo passado no seu código
-    const lang = locale || 'pt';
+    //const lang = locale || 'pt';
     let {t,i18n} = useTranslation();
     //useChangeLanguage(locale);
 
@@ -110,7 +110,7 @@ console.log(bucketData2)
             <Links />
         </head>
         <body>
-        <I18nProvider serverLanguage={lang}>
+        <I18nProvider serverLanguage={locale}>
             {/*<MiniSearch data={bucketData2} />*/}
 
             <UserSync
@@ -124,7 +124,7 @@ console.log(bucketData2)
                     <MiniSearch data={bucketData2} />
                     <AuthWidget
                         location={location}
-                        language={lang}
+                        language={locale}
                         countryCode={countryCode}
                         address={address}
                     />
