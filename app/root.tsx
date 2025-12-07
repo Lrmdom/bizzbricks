@@ -11,13 +11,15 @@ import {AuthWidget} from "~/auth/AuthWidget";
 import {UserSync} from "~/auth/components/UserSync";
 import {AuthProvider} from "~/auth/context/AuthContext";
 import {I18nProvider,useI18n} from "./context/I18nContext";
-
+//import {useChangeLanguage} from "remix-i18next/react";
+import {useTranslation} from "react-i18next";
 import type { Route } from "./+types/root";
 import "./app.css";
 import {useState} from "react";
 import MiniSearch from "~/components/MiniSearch";
-import {LanguageSelector} from "~/components/LanguageSelector";
-import { getGCSStorageClient } from '~/utils/gcs.server'; // Assumindo que esta é a localização da função
+import {LanguageSelector} from "~/components/LanguageSelector.";
+import { getGCSStorageClient } from '~/utils/gcs.server';
+import i18n from "~/i18n"; // Assumindo que esta é a localização da função
 export const links: Route.LinksFunction = () => [
     { rel: "preconnect", href: "https://fonts.googleapis.com" },
     {
@@ -54,11 +56,11 @@ export const loader = async ({request, params}: LoaderFunctionArgs) => {
     // 2. LÓGICA DE INICIALIZAÇÃO GCS DUPLICADA REMOVIDA AQUI!
 
     const ENV = { /* Adicione suas variáveis de ambiente aqui, se necessário */ };
-    const locale = getServerLanguage(request);
+    //const locale = getServerLanguage(request);
 
     // @ts-ignore
     !params.locale ? (params.locale = locale) : params.locale;
-
+    const locale = params.locale;
     const GCS_BUCKET_NAME = "bizzbricks-sanity-json-data";
     // Exemplo: bizzbricks-sanity-data-pt.json
     const GCS_DATA_FILE_NAME = `bizzbricks-sanity-data-${locale}.json`
@@ -95,10 +97,12 @@ console.log(bucketData2)
     const [countryCode, setCountryCode] = useState<string | null>(null);
     const [address, setAddress] = useState<string | null>(null);
     // Use 'locale' que vem do loader, pois 'loaderData?.serverLanguage' não está sendo passado no seu código
-    const lang = locale || 'en';
+    const lang = locale || 'pt';
+    let {t,i18n} = useTranslation();
+    //useChangeLanguage(locale);
 
     return (
-        <html lang={lang}>
+        <html lang={locale} >
         <head>
             <meta charSet="utf-8" />
             <meta name="viewport" content="width=device-width, initial-scale=1" />

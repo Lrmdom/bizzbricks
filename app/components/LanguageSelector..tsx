@@ -1,7 +1,8 @@
 // app/components/LanguageSelector.tsx
 import React, { useState, useRef, useEffect } from 'react';
 import { useI18n } from '~/context/I18nContext';
-
+import { Navigate  } from "react-router";
+import {useNavigate} from "react-router-dom";
 // --- Inline SVG Icons ---
 
 
@@ -30,10 +31,13 @@ export function LanguageSelector() {
     }, [ref]);
 
     const selectedLang = supportedLanguages.find(lang => lang.code === language) || supportedLanguages[0];
-
+const navigate=useNavigate()
     const handleSelect = (code: string) => {
         setLanguage(code);
         setIsOpen(false);
+        navigate(`/${code}`)
+        //window.location.href = `/${code}`;
+
     };
 
     return (
