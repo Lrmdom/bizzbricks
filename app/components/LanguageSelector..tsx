@@ -1,7 +1,6 @@
 // app/components/LanguageSelector.tsx
 import React, { useState, useRef, useEffect } from 'react';
 import { useI18n } from '~/context/I18nContext';
-import { Navigate  } from "react-router";
 import {useNavigate} from "react-router-dom";
 // --- Inline SVG Icons ---
 

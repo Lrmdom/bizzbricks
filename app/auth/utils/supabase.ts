@@ -6,7 +6,7 @@ const isBrowser = typeof window !== 'undefined';
 
 let supabaseInstance: ReturnType<typeof createClient> | null = null;
 
-export function getSupabase(supabaseUrl = "https://oamykovdfnfoktuvhdhg.supabase.co", supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9hbXlrb3ZkZm5mb2t0dXZoZGhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAwMjMyMjUsImV4cCI6MjA3NTU5OTIyNX0.N-3S5PwvVBUp3PPbPeoSA-zE5QRJdGu6lhkTAnzUDi4") {
+export function getSupabase(supabaseUrl = import.meta.env.VITE_SUPABASE_URL, supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY) {
     if (supabaseInstance) {
         return supabaseInstance;
     }
@@ -19,7 +19,7 @@ export function getSupabase(supabaseUrl = "https://oamykovdfnfoktuvhdhg.supabase
     supabaseInstance = createClient(supabaseUrl, supabaseKey);
     return supabaseInstance;
 }
-export function getSupabaseAdmin(supabaseUrl = "https://oamykovdfnfoktuvhdhg.supabase.co", supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9hbXlrb3ZkZm5mb2t0dXZoZGhnIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MDAyMzIyNSwiZXhwIjoyMDc1NTk5MjI1fQ.EOEmCmGrFZElDDPxwEgriV5dMxjuZ4OWfnpdwesrCwM") {
+export function getSupabaseAdmin(supabaseUrl = import.meta.env.VITE_SUPABASE_URL, supabaseKey = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY) {
     if (supabaseInstance) {
         return supabaseInstance;
     }
