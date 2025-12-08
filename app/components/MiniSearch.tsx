@@ -1,6 +1,6 @@
 import {useState, useMemo, useCallback, useRef, useEffect} from "react";
 import {Link, useParams} from "react-router-dom";
-import {X, Search, Euro, MapPin, Briefcase, List, Code, Layers} from "lucide-react"; // Novos ícones
+import {X, Search, Euro, MapPin, Briefcase, List, Code, Layers} from "lucide-react";
 
 // --- 🌍 Dicionário de Traduções ---
 const TRANSLATIONS = {
@@ -39,7 +39,7 @@ const TRANSLATIONS = {
     },
 };
 
-// Função utilitária para normalizar strings (sem acentos, espaços, maiúsculas)
+// Função utilitária para normalizar strings
 const normalize = (str: string | null | undefined) =>
     str
         ? str
@@ -50,55 +50,24 @@ const normalize = (str: string | null | undefined) =>
             .replace(/[^a-z0-9-]/g, "")
         : "";
 
-// --- 🎯 Funções de Extração de Texto para i18n ---
-
-/**
- * Extrai o valor em uma determinada locale de um campo internacionalizado.
- * Assume a estrutura:
- * {
- * _key: "pt",
- * _type: "internationalizedArrayStringValue",
- * value: "Texto"
- * }
- * ou
- * {
- * _key: "pt",
- * _type: "internationalizedArrayStringValue",
- * value: ["Texto 1", "Texto 2"]
- * }
- */
-const getI18nValue = (i18nField: any, locale: string) => {
-    if (!Array.isArray(i18nField)) return null;
-
-    const entry = i18nField.find((item: any) => item._key === locale);
-    if (!entry) return null;
-
-    // Concatena valores se for um array
-    return Array.isArray(entry.value) ? entry.value.join(" ") : entry.value;
-};
-
-// --- ⚠️ Novo: Tipagem Simplificada para o Novo JSON ---
-
 interface SearchItem {
-    id: string; // ID único para o resultado
-    group: 'category' | 'service' | 'need' | 'detail'; // Onde o item foi encontrado
-    name: string | null; // Nome primário
-    title: string | null; // Título
-    categoryName: string; // Nome da Categoria principal
-    serviceName: string | null; // Nome do Serviço (se aplicável)
-    linkId: string; // ID da Categoria para o link
-    price: number | null; // Preço do Serviço (se aplicável)
+    id: string;
+    group: 'category' | 'service' | 'need' | 'detail';
+    title: string | null;
+    categoryTitle: string;
+    serviceTitle: string | null;
+    linkId: string;
+    price: number | null;
 }
 
-// O componente agora recebe a lista principal de categorias
 interface MiniSearchProps {
-    data: any[]; // Array de categorias (Transição Digital, etc.)
+    data: any[];
 }
 
 export default function MiniSearch({data}: MiniSearchProps) {
     const [isExpanded, setIsExpanded] = useState(false);
     const [query, setQuery] = useState("");
-    const {locale: urlLocale} = useParams(); // 'locale' da URL
+    const {locale: urlLocale} = useParams();
     const locale = (urlLocale || "pt").toLowerCase();
 
     const inputRef = useRef<HTMLInputElement>(null);
@@ -117,93 +86,92 @@ export default function MiniSearch({data}: MiniSearchProps) {
         }
     }, [isExpanded]);
 
-    // --- 🔍 Nova Lógica de Indexação e Filtragem ---
-
-    // 1. Indexação: Pré-processa o JSON para uma lista plana de itens pesquisáveis
+    // 🔍 Indexação: Pré-processa o JSON para uma lista plana de itens pesquisáveis
     const indexedData = useMemo(() => {
         const index: SearchItem[] = [];
 
         data.forEach((category) => {
-            const categoryName = category.name || category._id;
+            const categoryTitle = category.title || category.name || category._id;
 
-            // 1.1. Categoria (Nível 1)
-            const categoryTitle = getI18nValue(category.title, locale) || category.name;
-            const categoryDesc = getI18nValue(category.description, locale);
-            if (categoryTitle) {
+            // 1. Categoria (Nível 1) - Pesquisa no title e description
+            if (category.title) {
                 index.push({
                     id: category._id,
                     group: 'category',
-                    name: category.name,
-                    title: categoryTitle,
-                    categoryName: category.name,
-                    serviceName: null,
+                    title: category.title,
+                    categoryTitle: categoryTitle,
+                    serviceTitle: null,
                     linkId: category._id,
                     price: null
                 });
             }
 
-            // Pesquisa também na descrição da categoria
-            if (categoryDesc) {
+            // Pesquisa também na description da categoria
+            if (category.description) {
                 index.push({
                     id: `${category._id}-desc`,
-                    group: 'detail', // Ou outro grupo para texto grande
-                    name: `Descrição de ${category.name}`,
-                    title: categoryDesc,
-                    categoryName: category.name,
-                    serviceName: null,
+                    group: 'detail',
+                    title: category.description,
+                    categoryTitle: categoryTitle,
+                    serviceTitle: null,
                     linkId: category._id,
                     price: null
                 });
             }
 
             (category.services || []).forEach((service: any) => {
-                const serviceName = service.name || service._id;
-                const serviceTitle = getI18nValue(service.title, locale) || service.name;
+                const serviceTitle = service.title || service.name || service._id;
                 const servicePrice = service.prices?.[0]?.price ?? null;
 
-                // 1.2. Serviço (Nível 2)
-                if (serviceTitle) {
+                // 2. Serviço (Nível 2) - Pesquisa no title
+                if (service.title) {
                     index.push({
                         id: service._id,
                         group: 'service',
-                        name: service.name,
-                        title: serviceTitle,
-                        categoryName: category.name,
-                        serviceName: service.name,
+                        title: service.title,
+                        categoryTitle: categoryTitle,
+                        serviceTitle: serviceTitle,
                         linkId: category._id,
                         price: servicePrice,
                     });
                 }
 
-                (service.customerNeeds || []).forEach((need: any) => {
-                    const needTitle = getI18nValue(need.title, locale) || need.name;
+                // Pesquisa na description do serviço
+                if (service.description) {
+                    index.push({
+                        id: `${service._id}-desc`,
+                        group: 'detail',
+                        title: service.description,
+                        categoryTitle: categoryTitle,
+                        serviceTitle: serviceTitle,
+                        linkId: category._id,
+                        price: null,
+                    });
+                }
 
-                    // 1.3. Necessidade do Cliente (Nível 3)
-                    if (needTitle) {
+                (service.customerNeeds || []).forEach((need: any) => {
+                    // 3. Necessidade do Cliente (Nível 3) - Pesquisa no title
+                    if (need.title) {
                         index.push({
                             id: need._id,
                             group: 'need',
-                            name: need.name,
-                            title: needTitle,
-                            categoryName: category.name,
-                            serviceName: service.name,
+                            title: need.title,
+                            categoryTitle: categoryTitle,
+                            serviceTitle: serviceTitle,
                             linkId: category._id,
                             price: null,
                         });
                     }
 
                     (need.details || []).forEach((detail: any) => {
-                        const detailTitle = getI18nValue(detail.title, locale) || detail.name;
-
-                        // 1.4. Detalhe Técnico (Nível 4)
-                        if (detailTitle) {
+                        // 4. Detalhe Técnico (Nível 4) - Pesquisa no title
+                        if (detail.title) {
                             index.push({
                                 id: detail._id,
                                 group: 'detail',
-                                name: detail.name,
-                                title: detailTitle,
-                                categoryName: category.name,
-                                serviceName: service.name,
+                                title: detail.title,
+                                categoryTitle: categoryTitle,
+                                serviceTitle: serviceTitle,
                                 linkId: category._id,
                                 price: null,
                             });
@@ -213,15 +181,13 @@ export default function MiniSearch({data}: MiniSearchProps) {
 
                 // Pesquisa nos detalhes do serviço
                 (service.details || []).forEach((detail: any) => {
-                    const detailTitle = getI18nValue(detail.title, locale) || detail.name;
-                    if (detailTitle) {
+                    if (detail.title) {
                         index.push({
                             id: `${service._id}-${detail._id}`,
                             group: 'detail',
-                            name: detail.name,
-                            title: detailTitle,
-                            categoryName: category.name,
-                            serviceName: service.name,
+                            title: detail.title,
+                            categoryTitle: categoryTitle,
+                            serviceTitle: serviceTitle,
                             linkId: category._id,
                             price: null,
                         });
@@ -231,31 +197,26 @@ export default function MiniSearch({data}: MiniSearchProps) {
         });
 
         return index;
-    }, [data, locale]);
+    }, [data]);
 
-    // 2. Filtragem: Filtra a lista indexada com base na query
+    // Filtragem: Filtra a lista indexada com base na query
     const filtered = useMemo(() => {
         const q = query.toLowerCase().trim();
         if (!q) return [];
 
         return indexedData.filter((item) => {
-            const searchTerms = [item.name, item.title, item.categoryName, item.serviceName]
-                .filter(Boolean)
-                .join(" ")
-                .toLowerCase();
-            return searchTerms.includes(q);
+            if (!item.title) return false;
+
+            // Pesquisa apenas no título (e não em outros campos)
+            return item.title.toLowerCase().includes(q);
         });
     }, [query, indexedData]);
 
-
-    // 🧭 Gera o link correto para cada item (Simplificado para a categoria principal)
-    // Assumimos que o link deve levar para a página da Categoria (nível 1)
+    // 🧭 Gera o link correto para cada item
     const getItemLink = (item: SearchItem) => {
         const loc = locale || "pt";
-        // Você precisará definir o formato do link com base no nome da categoria
-        const categorySlug = normalize(item.categoryName);
+        const categorySlug = normalize(item.categoryTitle);
         return `/${loc}/category/${categorySlug}`;
-        // Se a sua rota for dinâmica, use o _id: `/${loc}/category/${item.linkId}`
     };
 
     const getGroupTranslation = (group: SearchItem['group']) => {
@@ -292,8 +253,7 @@ export default function MiniSearch({data}: MiniSearchProps) {
             e.preventDefault();
             const first = getItemLink(filtered[0]);
             handleCloseResults();
-            // Implemente a navegação aqui, ex: navigate(first);
-            window.location.href = first; // Navegação simples
+            window.location.href = first;
         }
     };
 
@@ -366,12 +326,10 @@ export default function MiniSearch({data}: MiniSearchProps) {
                                 onClick={() => handleCloseResults()}
                                 className="flex items-center p-4 hover:bg-indigo-50 transition-colors duration-200"
                             >
-                                {/* Imagem removida, pois o novo JSON não a tem */}
-
                                 <div className="flex-1 min-w-0">
-                                    {/* Título Principal: Nome do item encontrado (pode ser title ou name) */}
+                                    {/* Título Principal */}
                                     <p className="font-semibold text-gray-800 truncate">
-                                        {item.title ?? item.name ?? t('no_name')}
+                                        {item.title || t('no_name')}
                                     </p>
 
                                     {/* Metadados: Grupo e Preço */}
@@ -384,7 +342,6 @@ export default function MiniSearch({data}: MiniSearchProps) {
                                             <span className="flex items-center text-indigo-600 font-bold">
                                                 <Euro size={12} className="mr-0.5" />
                                                 {item.price}
-                                                {/* Preço por mês/dia não está aqui, mas o modelo de preço está no serviço. */}
                                             </span>
                                         )}
                                     </div>
@@ -393,8 +350,8 @@ export default function MiniSearch({data}: MiniSearchProps) {
                                     <p className="text-xs text-gray-500 mt-1 flex items-center">
                                         <Layers size={12} className="mr-1 text-gray-400 flex-shrink-0" />
                                         <span className="truncate">
-                                            **{item.categoryName}**
-                                            {item.serviceName && ` > ${item.serviceName}`}
+                                            {item.categoryTitle}
+                                            {item.serviceTitle && ` > ${item.serviceTitle}`}
                                         </span>
                                     </p>
                                 </div>

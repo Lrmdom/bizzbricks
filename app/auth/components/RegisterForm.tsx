@@ -100,7 +100,7 @@ export function RegisterForm({ onClose, onSwitchToLogin }: RegisterFormProps) {
                 data: {
                     // Aqui você pode adicionar outros dados do perfil se necessário
                 },
-                emailRedirectTo: `${window.location.origin}/auth/confirm`,
+                emailRedirectTo: `${window.location.origin}`,
             },
         });
 
