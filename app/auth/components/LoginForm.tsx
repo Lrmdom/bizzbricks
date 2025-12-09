@@ -1,7 +1,7 @@
 // app/components/LoginForm.tsx
 import { useEffect, useRef, useState } from 'react';
 import { getSupabase, supabase } from '~/auth/utils/supabase';
-
+import i18n from "i18next";
 import {
     ensureCommerceLayerCustomer,
     upsertProfileServiceBrandRecord
@@ -143,7 +143,7 @@ export function LoginForm({ onClose, onSwitchToRegister }: LoginFormProps) {
             provider,
             options: {
                 scopes: provider === 'linkedin_oidc' ? 'openid profile email' : provider === 'azure' ? "openid profile email user.read" : '',
-                redirectTo: window.location.origin,
+                redirectTo: `${window.location.origin}/${i18n.resolvedLanguage}`,
             },
         });
 
@@ -160,7 +160,7 @@ export function LoginForm({ onClose, onSwitchToRegister }: LoginFormProps) {
         setError(null);
 
         const { error: resetError } = await supabase.auth.resetPasswordForEmail(forgotPasswordEmail, {
-            redirectTo: `${window.location.origin}/welcome-and-reset-password`,
+            redirectTo: `${window.location.origin}/${i18n.resolvedLanguage}/welcome-and-reset-password`,
         });
 
         if (resetError) {

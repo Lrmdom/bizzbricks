@@ -6,7 +6,7 @@ import {
     ensureCommerceLayerCustomer,
     upsertProfileServiceBrandRecord
 } from '~/auth/utils/commerce-service';
-
+import i18n from "i18next";
 declare global {
     interface Window {
         turnstile: any;
@@ -100,7 +100,7 @@ export function RegisterForm({ onClose, onSwitchToLogin }: RegisterFormProps) {
                 data: {
                     // Aqui você pode adicionar outros dados do perfil se necessário
                 },
-                emailRedirectTo: `${window.location.origin}`,
+                emailRedirectTo: `${window.location.origin}/${i18n.resolvedLanguage}`,
             },
         });
 

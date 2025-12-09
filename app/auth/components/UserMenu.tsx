@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from 'react'
 import { supabase } from '~/auth/utils/supabase'
 import type { User } from '@supabase/supabase-js'
 import { UserSettingsModal } from './UserSettingsModal'
+import i18n from "i18next";
 
 interface UserMenuProps {
     user: User
@@ -40,8 +41,7 @@ export function UserMenu({ user, clToken }: UserMenuProps) {
         } catch (e) {
             console.warn('Failed to clear local storage', e);
         } finally {
-            // Redireciona para a página de login
-            window.location.replace('/');
+            window.location.replace(`/${i18n.resolvedLanguage}`);
         }
     }
     const handleLogout = async () => {

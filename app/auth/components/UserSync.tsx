@@ -173,12 +173,14 @@ export function UserSync({
                     country: getCountryName(countryCode),
                     // Dados do idioma
                     language_code: lang,
+                    app_language: contextLanguage,
                     // Dados do dispositivo e navegador
                     device_type: deviceInfo.type,
                     browser_name: browserInfo.name,
                     browser_version: browserInfo.version,
                     brand_name: profile?.profile_service_brand[0]?.brand?.name,
                     app_name:profile?.profile_service_brand[0]?.app?.name,
+                    app_language: contextLanguage,
                     // Metadata adicional
                     metadata: {
                         user_agent: navigator.userAgent,
